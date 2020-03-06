@@ -4,6 +4,7 @@ import javax.servlet.Filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
@@ -17,12 +18,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.lildutils.springboot.jwt.auth.LDuJwtAuthenticationProvider;
+import com.lildutils.springboot.jwt.controller.advice.LDuJwtControllerAdvice;
 import com.lildutils.springboot.jwt.filter.LDuJwtAuthenticationFilter;
 import com.lildutils.springboot.jwt.service.LDuJwtService;
 import com.lildutils.springboot.jwt.service.impl.LDuJwtServiceImpl;
 
 @Configuration
 @Order(200)
+@ComponentScan(basePackageClasses = LDuJwtControllerAdvice.class)
 public class LDuJwtConfigurer extends WebSecurityConfigurerAdapter
 {
 	@Autowired
