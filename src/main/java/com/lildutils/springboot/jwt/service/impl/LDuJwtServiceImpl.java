@@ -45,9 +45,12 @@ public class LDuJwtServiceImpl implements LDuJwtService
 			final Builder jwtBuilder = JWT.create().withJWTId( jwtId ).withSubject( subject ).withIssuedAt( createdAt )
 					.withExpiresAt( expiration ).withNotBefore( createdAt ).withAudience( "JWT" ).withIssuer( issuer );
 
-			for( Entry<String, String> entry : claims.entrySet() )
+			if( claims != null && !claims.isEmpty() )
 			{
-				jwtBuilder.withClaim( entry.getKey(), entry.getValue() );
+				for( Entry<String, String> entry : claims.entrySet() )
+				{
+					jwtBuilder.withClaim( entry.getKey(), entry.getValue() );
+				}
 			}
 
 			return jwtBuilder.sign( algorithm );

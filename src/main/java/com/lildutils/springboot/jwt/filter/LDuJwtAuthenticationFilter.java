@@ -34,7 +34,6 @@ public class LDuJwtAuthenticationFilter extends BasicAuthenticationFilter
 			throws IOException, ServletException
 	{
 		final String authorization = request.getHeader( authorizationHeader );
-
 		if( StringUtils.isNotBlank( authorization ) && authorization.startsWith( authorizationSchema ) )
 		{
 			try

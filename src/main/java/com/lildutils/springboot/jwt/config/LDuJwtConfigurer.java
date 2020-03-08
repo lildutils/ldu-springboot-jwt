@@ -6,38 +6,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.lildutils.springboot.jwt.auth.LDuJwtAuthenticationProvider;
 import com.lildutils.springboot.jwt.controller.advice.LDuJwtControllerAdvice;
 import com.lildutils.springboot.jwt.filter.LDuJwtAuthenticationFilter;
+import com.lildutils.springboot.jwt.security.LDuJwtSecurityRegister;
 import com.lildutils.springboot.jwt.service.LDuJwtService;
 import com.lildutils.springboot.jwt.service.impl.LDuJwtServiceImpl;
 
 @Configuration
-@Order(200)
-@ComponentScan(basePackageClasses = LDuJwtControllerAdvice.class)
-public class LDuJwtConfigurer extends WebSecurityConfigurerAdapter
+@ComponentScan(basePackageClasses =
+{ LDuJwtControllerAdvice.class, LDuJwtSecurityRegister.class })
+public class LDuJwtConfigurer
 {
 	@Autowired
-	private Environment environment;
+	private Environment				environment;
 
-	@Override
-	protected void configure( HttpSecurity http ) throws Exception
-	{
-		super.configure( http );
-		http.sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
-				.addFilterBefore( getAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class );;
-	}
+	@Autowired
+	private AuthenticationManager	authenticationManager;
 
 	@Bean("authenticationFilter")
 	public Filter getAuthenticationFilter() throws Exception
@@ -45,13 +36,7 @@ public class LDuJwtConfigurer extends WebSecurityConfigurerAdapter
 		final LDuJwtConfig config = new LDuJwtConfig();
 		config.setAuthorizationHeader( environment.getProperty( "ldu.jwt.auth.header" ) );
 		config.setAuthorizationSchema( environment.getProperty( "ldu.jwt.auth.schema" ) );
-		return new LDuJwtAuthenticationFilter( getAuthenticationManager(), config );
-	}
-
-	@Bean("authenticationManager")
-	public AuthenticationManager getAuthenticationManager() throws Exception
-	{
-		return super.authenticationManager();
+		return new LDuJwtAuthenticationFilter( authenticationManager, config );
 	}
 
 	@Bean("authenticationProvider")
