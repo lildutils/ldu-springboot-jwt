@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -39,15 +40,21 @@ public class LDuJwtAuthenticationFilter extends BasicAuthenticationFilter
 			try
 			{
 				final String jwt = authorization.substring( authorizationSchema.length() );
-				SecurityContextHolder.getContext().setAuthentication(
-						getAuthenticationManager().authenticate( new LDuJwtAuthenticationToken( jwt ) ) );
-				logger.info( "JWT Authentication Success! " + request.getMethod() + " " + request.getRequestURL() );
+				final LDuJwtAuthenticationToken authToken = (LDuJwtAuthenticationToken) getAuthenticationManager()
+						.authenticate( new UsernamePasswordAuthenticationToken( null, jwt ) );
+				if( authToken.isAuthenticated() )
+				{
+					SecurityContextHolder.getContext().setAuthentication( authToken );
+					logger.info( "JWT Authentication Success! " + request.getMethod() + " " + request.getRequestURL() );
+				}
 			}
 			catch( Exception e )
 			{
 				response.setStatus( HttpStatus.FORBIDDEN.value() );
 				response.setCharacterEncoding( StandardCharsets.UTF_8.name() );
+				SecurityContextHolder.clearContext();
 				logger.info( "JWT Authentication Failed! " + request.getMethod() + " " + request.getRequestURL() );
+				logger.error( "JWT Exception: " + e );
 				return;
 			}
 		}

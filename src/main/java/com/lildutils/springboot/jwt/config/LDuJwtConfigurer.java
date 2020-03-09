@@ -1,14 +1,11 @@
 package com.lildutils.springboot.jwt.config;
 
-import javax.servlet.Filter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -30,8 +27,8 @@ public class LDuJwtConfigurer
 	@Autowired
 	private AuthenticationManager	authenticationManager;
 
-	@Bean("authenticationFilter")
-	public Filter getAuthenticationFilter() throws Exception
+	@Bean("lduJwtAuthenticationFilter")
+	public LDuJwtAuthenticationFilter getAuthenticationFilter() throws Exception
 	{
 		final LDuJwtConfig config = new LDuJwtConfig();
 		config.setAuthorizationHeader( environment.getProperty( "ldu.jwt.auth.header" ) );
@@ -39,25 +36,25 @@ public class LDuJwtConfigurer
 		return new LDuJwtAuthenticationFilter( authenticationManager, config );
 	}
 
-	@Bean("authenticationProvider")
-	public AuthenticationProvider getLDuJwtAuthenticationProvider()
+	@Bean("lduJwtAuthenticationProvider")
+	public LDuJwtAuthenticationProvider getLDuJwtAuthenticationProvider()
 	{
-		return new LDuJwtAuthenticationProvider();
+		return new LDuJwtAuthenticationProvider( getLDuJwtService() );
 	}
 
-	@Bean("passwordEncoder")
-	public PasswordEncoder getPasswordEncoder()
-	{
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean("jwtService")
+	@Bean("lduJwtService")
 	public LDuJwtService getLDuJwtService()
 	{
 		final LDuJwtConfig config = new LDuJwtConfig();
 		config.setSecret( environment.getProperty( "ldu.jwt.secret" ) );
 		config.setIssuer( environment.getProperty( "ldu.jwt.issuer" ) );
 		return new LDuJwtServiceImpl( config );
+	}
+
+	@Bean("passwordEncoder")
+	public PasswordEncoder getPasswordEncoder()
+	{
+		return new BCryptPasswordEncoder();
 	}
 
 }
