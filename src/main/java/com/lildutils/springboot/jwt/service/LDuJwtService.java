@@ -10,4 +10,6 @@ public interface LDuJwtService
 
 	DecodedJWT unpack( String jwt );
 
+	boolean validate( String jwt );
+
 }

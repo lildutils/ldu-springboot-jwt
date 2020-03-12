@@ -12,7 +12,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.lildutils.springboot.jwt.config.LDuJwtConfig;
+import com.lildutils.springboot.jwt.filter.LDuJwtAuthenticationFilterConfig;
 import com.lildutils.springboot.jwt.service.LDuJwtService;
 import com.lildutils.springboot.jwt.service.ex.LDuJwtException;
 
@@ -22,10 +22,10 @@ public class LDuJwtServiceImpl implements LDuJwtService
 	private final Algorithm	algorithm;
 	private final String	issuer;
 
-	public LDuJwtServiceImpl( LDuJwtConfig config )
+	public LDuJwtServiceImpl( LDuJwtAuthenticationFilterConfig config )
 	{
 		super();
-		this.algorithm = Algorithm.HMAC256( config.getSecret() );
+		this.algorithm = Algorithm.HMAC256( config.getSecret().getBytes() );
 		this.issuer = config.getIssuer();
 	}
 
@@ -36,7 +36,7 @@ public class LDuJwtServiceImpl implements LDuJwtService
 		{
 			final LocalDateTime now = LocalDateTime.now();
 
-			final String jwtId = String.valueOf( (new Date()).getTime() + (Math.random() * 100) );
+			final String jwtId = String.valueOf( (new Date()).getTime() + (int) (Math.random() * 100) );
 
 			final Date createdAt = Date.from( now.atZone( ZoneId.systemDefault() ).toInstant() );
 			final Date expiration = Date
@@ -52,7 +52,6 @@ public class LDuJwtServiceImpl implements LDuJwtService
 					jwtBuilder.withClaim( entry.getKey(), entry.getValue() );
 				}
 			}
-
 			return jwtBuilder.sign( algorithm );
 		}
 		catch( Exception e )
@@ -66,7 +65,21 @@ public class LDuJwtServiceImpl implements LDuJwtService
 	{
 		try
 		{
+			validate( jwt );
 			return JWT.decode( jwt );
+		}
+		catch( Exception e )
+		{
+			throw new LDuJwtException( e.getMessage() );
+		}
+	}
+
+	@Override
+	public boolean validate( String jwt )
+	{
+		try
+		{
+			return JWT.require( algorithm ).build().verify( jwt ) != null;
 		}
 		catch( Exception e )
 		{

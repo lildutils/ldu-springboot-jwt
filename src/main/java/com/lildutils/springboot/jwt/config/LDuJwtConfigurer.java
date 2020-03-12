@@ -10,15 +10,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.lildutils.springboot.jwt.auth.LDuJwtAuthenticationProvider;
-import com.lildutils.springboot.jwt.controller.advice.LDuJwtControllerAdvice;
 import com.lildutils.springboot.jwt.filter.LDuJwtAuthenticationFilter;
-import com.lildutils.springboot.jwt.security.LDuJwtSecurityRegister;
+import com.lildutils.springboot.jwt.filter.LDuJwtAuthenticationFilterConfig;
+import com.lildutils.springboot.jwt.security.LDuJwtWebSecurityConfigurer;
 import com.lildutils.springboot.jwt.service.LDuJwtService;
 import com.lildutils.springboot.jwt.service.impl.LDuJwtServiceImpl;
 
 @Configuration
-@ComponentScan(basePackageClasses =
-{ LDuJwtControllerAdvice.class, LDuJwtSecurityRegister.class })
+@ComponentScan(basePackageClasses = LDuJwtWebSecurityConfigurer.class)
 public class LDuJwtConfigurer
 {
 	@Autowired
@@ -30,7 +29,7 @@ public class LDuJwtConfigurer
 	@Bean("lduJwtAuthenticationFilter")
 	public LDuJwtAuthenticationFilter getAuthenticationFilter() throws Exception
 	{
-		final LDuJwtConfig config = new LDuJwtConfig();
+		final LDuJwtAuthenticationFilterConfig config = new LDuJwtAuthenticationFilterConfig();
 		config.setAuthorizationHeader( environment.getProperty( "ldu.jwt.auth.header" ) );
 		config.setAuthorizationSchema( environment.getProperty( "ldu.jwt.auth.schema" ) );
 		return new LDuJwtAuthenticationFilter( authenticationManager, config );
@@ -45,7 +44,7 @@ public class LDuJwtConfigurer
 	@Bean("lduJwtService")
 	public LDuJwtService getLDuJwtService()
 	{
-		final LDuJwtConfig config = new LDuJwtConfig();
+		final LDuJwtAuthenticationFilterConfig config = new LDuJwtAuthenticationFilterConfig();
 		config.setSecret( environment.getProperty( "ldu.jwt.secret" ) );
 		config.setIssuer( environment.getProperty( "ldu.jwt.issuer" ) );
 		return new LDuJwtServiceImpl( config );

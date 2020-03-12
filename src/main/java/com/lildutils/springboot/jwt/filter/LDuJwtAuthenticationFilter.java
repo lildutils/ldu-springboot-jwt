@@ -16,14 +16,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.lildutils.springboot.jwt.auth.LDuJwtAuthenticationToken;
-import com.lildutils.springboot.jwt.config.LDuJwtConfig;
 
 public class LDuJwtAuthenticationFilter extends BasicAuthenticationFilter
 {
 	private final String	authorizationHeader;
 	private final String	authorizationSchema;
 
-	public LDuJwtAuthenticationFilter( AuthenticationManager authenticationManager, LDuJwtConfig config )
+	public LDuJwtAuthenticationFilter( AuthenticationManager authenticationManager, LDuJwtAuthenticationFilterConfig config )
 	{
 		super( authenticationManager );
 		this.authorizationHeader = config.getAuthorizationHeader();

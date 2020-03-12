@@ -1,13 +1,13 @@
-package com.lildutils.springboot.jwt.config;
+package com.lildutils.springboot.jwt.filter;
 
-public class LDuJwtConfig
+public class LDuJwtAuthenticationFilterConfig
 {
 	private String	authorizationHeader;
 	private String	authorizationSchema;
 	private String	secret;
 	private String	issuer;
 
-	public LDuJwtConfig()
+	public LDuJwtAuthenticationFilterConfig()
 	{
 		super();
 	}
